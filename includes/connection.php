@@ -1,12 +1,12 @@
 <?php
 // Configuración de la base de datos
-$db_host = 'localhost';
-$db_username = '';
-$db_password = '';
-$db_name = '';
+$dbHost = 'localhost';
+$dbUsername = '';
+$dbPassword = '';
+$dbName = '';
 
 // Crear conexión
-$conn = new mysqli($db_host, $db_username, $db_password, $db_name);
+$conn = new mysqli($dbHost, $dbUsername, $dbPassword, $dbName);
 
 // Verificar la conexión
 if ($conn->connect_error) {
