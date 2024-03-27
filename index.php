@@ -7,14 +7,13 @@
     <link rel='stylesheet' href='https://use.fontawesome.com/releases/v5.2.0/css/all.css'>
     <link rel='stylesheet' href='https://use.fontawesome.com/releases/v5.2.0/css/fontawesome.css'>
     <link rel="stylesheet" href="./public/assets/css/style.css">
-
 </head>
 
 <body>
     <div class="container">
         <div class="screen">
             <div class="screen__content">
-                <form class="login" method="post" action="functions/login.php">
+                <form class="login" method="post" action="includes/login.php">
                     <div class="login__field">
                         <i class="login__icon fas fa-user"></i>
                         <input type="text" class="login__input" name="username" placeholder="Nombre de usuario">
