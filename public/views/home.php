@@ -1,5 +1,6 @@
 <?php
 include_once '../../includes/verifySession.php';
+validateSession();
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -69,52 +70,15 @@ include_once '../../includes/verifySession.php';
 				<div class="row py-lg-5">
 					<div class="col-lg-6 col-md-8 mx-auto">
 						<h1 class="fw-light">Sistema administrativo de alumnos</h1>
-						<p class="lead text-body-secondary">Something short and leading about the collection below—its contents, the creator, etc. Make it short and sweet, but not too short so folks don’t simply skip over it entirely.</p>
-						<button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal" id="openModal">Open Modal</button>
+						<p class="lead text-body-secondary">Visualiza, crea, edita o elimina a los alumnos registrados</p>
+						<button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal" id="openModal">Registrar alumno</button>
 					</div>
 				</div>
 			</section>
 
 			<div class="container">
 				<div class="row">
-					<?php
-					// Incluir el archivo de conexión a la base de datos
-					include_once '../../includes/connection.php';
-
-					// Realizar la consulta para obtener los estudiantes
-					$sql = "SELECT id, name, first_last_name, second_last_name, grade, serial FROM students";
-					$result = $conn->query($sql);
-
-					// Verificar si hay resultados
-					if ($result->num_rows > 0) {
-						// Mostrar la tabla HTML con los datos de los estudiantes
-						echo "<table id='studentsTable'>
-							<thead><tr>
-								<th>ID</th>
-								<th>Nombre</th>
-								<th>Matricula</th>
-								<th>Grupo</th>
-								<th>Opciones</th>
-							</tr></thead><tbody>";
-
-						// Iterar sobre cada fila de resultados
-						while ($data = $result->fetch_assoc()) {
-							echo "<tr>
-								<td>" . $data['id'] . "</td>
-								<td>" . $data['name'] . ' ' . $data['first_last_name'] . ' ' . $data['second_last_name'] . "</td>
-								<td>" . $data['serial'] . "</td>
-								<td>" . $data['grade'] . "</td>
-								<td><button class='btn btn-sm btn-warning' id='btn-edit'><i class='bi bi-pencil'></i>Editar</button>
-								<button class='btn btn-sm btn-danger' id='btn-destroy' data-id='" . $data['id'] . "'><i class='bi bi-trash'></i>Eliminar</button>
-							</tr>";
-						}
-						echo "</tbody></table>";
-					} else {
-						echo "<h3>No se encontraron estudiantes registrados.</h3>";
-					}
-					// Cerrar la conexión a la base de datos
-					$conn->close();
-					?>
+					<table id="studentsTable"></table>
 				</div>
 			</div>
 
@@ -168,6 +132,39 @@ include_once '../../includes/verifySession.php';
 	<script>
 		$(document).ready(function() {
 			const table = $('#studentsTable').DataTable({
+				processing: true,
+				serverSide: false,
+				ajax: {
+					url: "../../functions/index.php",
+					type: "POST",
+					dataType: 'json',
+				},
+				columns: [
+					{
+						"data": "id"
+					},
+					{
+						"data": "name"
+					},
+					{
+						"data": "first_last_name"
+					},
+					{
+						"data": "second_last_name"
+					},
+					{
+						"data": "grade"
+					},
+					{
+						"data": "serial"
+					},
+					{
+						"data": null,
+						"render": function(data, type, row) {
+							return '<button class="btn btn-sm btn-warning" id="btn-edit" data-id="' + row.id + '">Editar</button> <button class="btn btn-sm btn-danger" id="btn-destroy" data-id="' + row.id + '">Eliminar</button>';
+						}
+					}
+				],
 				language: {
 					url: 'https://cdn.datatables.net/plug-ins/1.11.5/i18n/es-MX.json'
 				},
@@ -184,7 +181,7 @@ include_once '../../includes/verifySession.php';
 			$('#studentsTable').on('click', '#btn-edit', function() {
 				let studentId = $(this).closest('tr').find('td:first').text();
 				$.ajax({
-					url: '../../functions/get.php',
+					url: '../../functions/getById.php',
 					method: 'GET',
 					data: {
 						id: studentId
@@ -225,6 +222,7 @@ include_once '../../includes/verifySession.php';
 						success: function(response) {
 							if (response.success) alert(response.message);
 							console.log('Respuesta del servidor:', response);
+							table.ajax.reload();
 						},
 						error: function(xhr, status, error) {
 							alert('Error al eliminar al estudiante');
@@ -254,6 +252,7 @@ include_once '../../includes/verifySession.php';
 						success: function (response) {
 							if (response.success) alert(response.message)
 							console.log('Respuesta del servidor:', response);
+							table.ajax.reload();
 							$('#myModal').modal('hide');
 						},
 						error: function (xhr, status, error) {
@@ -264,9 +263,9 @@ include_once '../../includes/verifySession.php';
 				} else {
 					$.ajax({
 						url: '../../functions/update.php',
-						method: 'PATCH',
+						method: 'POST',
 						data: {
-							id: $('#studentId').val(),
+							studentId: $('#studentId').val(),
 							name: $('#name').val(),
 							first_last_name: $('#first_last_name').val(),
 							second_last_name: $('#second_last_name').val(),
@@ -277,6 +276,7 @@ include_once '../../includes/verifySession.php';
 						success: function (response) {
 							if (response.success) alert(response.message)
 							console.log('Respuesta del servidor:', response);
+							table.ajax.reload();
 							$('#myModal').modal('hide');
 						},
 						error: function (xhr, status, error) {
