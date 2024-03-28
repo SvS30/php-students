@@ -4,8 +4,9 @@ Admin Students in PHP native with Bootstrap.
 ### Folder Structure
 #### - functions
 folder containing functions that can be used global by students actions, as:
+- index.php: Get students data
 - destroy.php: Destroy student action
-- get.php: Get student data
+- getById.php: Get student data by id
 - store.php: Store a new student
 - update.php: Update a student
 
