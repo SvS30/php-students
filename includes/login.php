@@ -2,7 +2,7 @@
 session_start();
 
 // Incluir archivo de conexión
-include_once('./includes/connection.php');
+include_once('./connection.php');
 
 // Función para validar las credenciales en la base de datos
 function checkCredentials($conn, $username, $password) {
