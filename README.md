@@ -34,3 +34,11 @@ folder containing resources by frontend.
 
 ### How to Run
 - after clone code, open a terminal on the folder and run: `php -S localhost:8000`
+
+### Help
+- to create new user:
+  - execute `php generatePassword.php` and copy the password.
+  - execute query sql with new password:
+    ```sql
+      INSERT INTO users (username, password) VALUES ('admin', 'passwordHere');
+    ```
