@@ -7,15 +7,14 @@ include_once('./connection.php');
 // Función para validar las credenciales en la base de datos
 function checkCredentials($conn, $username, $password) {
     // Consulta SQL para obtener el usuario de la base de datos
-    $sql = "SELECT id, username, password FROM users WHERE username = ?";
+    $sql = "SELECT id, username, password FROM users WHERE username = ? AND password = ?";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("s", $username);
+    $stmt->bind_param("ss", $username, $password);
     $stmt->execute();
     $result = $stmt->get_result();
     $user = $result->fetch_assoc();
-    $passwordVerify = password_verify($password, $user['password']);
     $conn->close();
-    return ($user && $passwordVerify) ? true : false;
+    return ($user) ? true : false;
 }
 
 // Función para manejar la redirección y los mensajes de error

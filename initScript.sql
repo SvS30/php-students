@@ -5,7 +5,7 @@ CREATE TABLE users (
 	    password VARCHAR(255) NOT NULL
 );
 
-INSERT INTO users (username, password) VALUES ('admin', '$2y$10$fDhrGMRMAwjNplH4XQr4h.CH52yXQ7tCZSKksSkz4l1PpQ/j2Mtza');
+INSERT INTO users (username, password) VALUES ('admin', 'admin');
 
 
 DROP TABLE IF EXISTS students;
