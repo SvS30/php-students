@@ -52,7 +52,7 @@ validateSession();
 							</li>
 							<li>
 								<a href="#" class="nav-link text-white">
-									<?php echo $_SESSION['username']; ?> 
+									<?php echo $_SESSION['username']; ?>
 								</a>
 							</li>
 							<li>
@@ -141,41 +141,79 @@ validateSession();
 				},
 				columns: [
 					{
-						"data": "id"
+						"data": "id", "title": "ID"
 					},
 					{
-						"data": "name"
+						"data": "name", "title": "Nombre"
 					},
 					{
-						"data": "first_last_name"
+						"data": "first_last_name", "title": "Apellido Paterno"
 					},
 					{
-						"data": "second_last_name"
+						"data": "second_last_name", "title": "Apellido Materno"
 					},
 					{
-						"data": "grade"
+						"data": "grade", "title": "Grado"
 					},
 					{
-						"data": "serial"
+						"data": "serial", "title": "Matricula"
 					},
 					{
 						"data": null,
 						"render": function(data, type, row) {
-							return '<button class="btn btn-sm btn-warning" id="btn-edit" data-id="' + row.id + '">Editar</button> <button class="btn btn-sm btn-danger" id="btn-destroy" data-id="' + row.id + '">Eliminar</button>';
-						}
+							return '<button class="btn btn-sm btn-warning" id="btn-edit" data-id="' + row.id + '">Editar</button> <button class="btn btn-sm btn-danger" id="btn-destroy" data-id="' + row.id + '">Eliminar</button> <button class="btn btn-sm btn-primary btn-export" data-id="' + row.id + '">Exportar CSV</button>';
+						},
+						"title": "Opciones"
 					}
 				],
 				language: {
 					url: 'https://cdn.datatables.net/plug-ins/1.11.5/i18n/es-MX.json'
 				},
 				dom: 'lBfrtip',
-				buttons: ['csv']
+				buttons: [
+					{
+						extend: 'csv',
+						text: 'Exportar CSV',
+						className: 'btn btn-sm btn-primary',
+						exportOptions: {
+							columns: [0, 1, 2, 3, 4, 5],
+							modifier: {
+								selected: true // Exporta solo las filas seleccionadas
+							}
+						}
+					}
+				]
 			});
 
 			// Abre el modal y carga el formulario en blanco
 			$('#openModal').on('click', function() {
 				$('#studentForm')[0].reset(); // Limpia el formulario
 				$('#studentId').val(''); // Restablece el ID del estudiante a vacío
+			});
+
+			$('#studentsTable').on('click', '.btn-export', function() {
+				let studentId = $(this).data('id');
+				// Realizar solicitud AJAX para obtener los datos del estudiante
+				$.ajax({
+					url: '../../functions/getById.php',
+					method: 'GET',
+					data: {
+						id: studentId
+					},
+					dataType: 'json',
+					success: function(response) {
+						if (response.success) {
+							// Generar CSV con los datos del estudiante
+							generateCSV(response.data);
+						} else {
+							alert('Error al obtener los datos del estudiante');
+						}
+					},
+					error: function(xhr, status, error) {
+						alert('Error al obtener los datos del estudiante');
+						console.error(error);
+					}
+				});
 			});
 
 			$('#studentsTable').on('click', '#btn-edit', function() {
@@ -286,6 +324,24 @@ validateSession();
 					})
 				}
 			});
+
+			// Función para generar el CSV
+			function generateCSV(studentData) {
+				// Construir contenido CSV con los datos del estudiante
+				let csvContent = "data:text/csv;charset=utf-8,";
+				csvContent += "Nombre,Apellido Paterno,Apellido Materno,Matrícula,Grupo\n";
+				csvContent += `${studentData.name},${studentData.first_last_name},${studentData.second_last_name},${studentData.serial},${studentData.grade}\n`;
+
+				// Crear enlace de descarga del archivo CSV
+				var encodedUri = encodeURI(csvContent);
+				var link = document.createElement("a");
+				link.setAttribute("href", encodedUri);
+				link.setAttribute("download", "datos_estudiante.csv");
+				document.body.appendChild(link);
+
+				// Simular clic en el enlace para iniciar la descarga
+				link.click();
+			}
 		});
 	</script>
 </body>
